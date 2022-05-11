@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: t7d
+  name: t7d-notification
+  labels:
+    app: t7d-notification
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: t7d-notification
+  template:
+    metadata:
+      labels:
+        app:  t7d-notification
+    spec:
+      imagePullSecrets:
+        - name: nexus-keys
+      containers:
+        - name: t7d-profile
+          image: docker.galactechstudio.com/t7d-notification:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: t7d
+  name: t7d-notification
+spec:
+  selector:
+    app: t7d-notification
+  ports:
+    - protocol: TCP
+      port: 30002
+      targetPort: 3000
