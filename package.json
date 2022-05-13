@@ -14,7 +14,7 @@
   "dependencies": {
     "@elastic/ecs-morgan-format": "^1.1.0",
     "amqplib": "^0.8.0",
-    "axios": "^0.24.0",
+    "axios": "^0.26.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
