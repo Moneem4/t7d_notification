@@ -54,7 +54,7 @@ exports.findNotificationsByProfileId = async (req, res) => {
 exports.findAllSeenNotification = async (req, res) => {
   try {
     const { profileId } = req.params;
-    const notifications = await notificationModel.find({ to: profileId,seen:true });
+    const notifications = await notificationModel.find({ "to.profile_id": profileId,"to.seen":true });
     if (!notifications || notifications.length==0) {res.status(401).json("notification doesn't exist");}
     else {
       res.status(200).send({ message: "success", data: notifications });
@@ -68,10 +68,13 @@ exports.findAllSeenNotification = async (req, res) => {
  };
 //create notification 
 exports.createNotification = async (req, res) => {
-  let obj={body,to,from,link,icon,title,categoryType,notiftype}=req.body
+  let obj={body,consignees,from,link,icon,title,categoryType,notifType}=req.body
   
   try {
     const notification = new notificationModel(obj);
+    consignees.forEach(profile => {
+      notification.to.push({ profileId: profile });
+    })
     const notificationCreated=   await notification.save();
     res.status(200).send({ message: "success", data: notificationCreated });
   } catch (error) {
@@ -86,16 +89,17 @@ exports.createNotification = async (req, res) => {
 // Send  notification using node-cron 
 exports.sendNotification = async (req, res) => {
   // retrieve all the attributes passed it in body 
-   let obj= {title,icon,link,body,from,to,categoryType,notifType}=req.body;
-   
+   let obj= {title,icon,link,body,from,consignees,categoryType,notifType}=req.body;
+   console.log("registrationTokens :  ",req.body.registrationTokens)
    try {
-   const  registrationToken = req.body.registrationToken
+   const  registrationTokens = req.body.registrationTokens
    //put your server key here
    const serverKey =process.env.SERVER_KEY; 
    let fcm= new FCM(serverKey) 
-   var message = { 
+   const notificationCreated = new notificationModel(obj);
+     var message = { 
      //this may vary according to the message type (single recipient, multicast, topic, et cetera)
-     to: registrationToken, 
+     registration_ids: registrationTokens, 
      notification: {
          title: req.body.title, 
          body: req.body.body,
@@ -105,24 +109,34 @@ exports.sendNotification = async (req, res) => {
      },
  }
  
- fcm.send(message, async function(err, response){
+  fcm.send(message, async function(err, response){
   if (err) {
-    return   res.status(400).send("Some error occurred while sending this notification")
-  } else {
-    const notification = new notificationModel(obj);
-    await notification.save();
-    return   res.status(200).send({ message:"Notification sent successfully", data: response })
-  }
-})
+    console.log("Something has gone wrong!")
+    res.status(res.statusCode).send({ message: "error sending notification"});
+  } 
+  else {
+    consignees.forEach(profile => {
+      notificationCreated.to.push({ profile_id: profile });
+        })
+    console.log("Successfully sent with response: ", response)
+    if(notificationCreated.to && notificationCreated.to.length > 0)
+   {
+  const notificationSaved= await notificationCreated.save();   
+  res.status(res.statusCode).send({ message: "success",data:notificationSaved});
+}  
+    
+ }
+})    
 } catch(error) {
   res.status(500).json({
     message: "error",
     data: {
-      errorMessage: "Some error occurred while creating this notification",
+      errorMessage: "Some error occurred ",
     },
   });
   
 }
+
  };
 
 //Update notification
