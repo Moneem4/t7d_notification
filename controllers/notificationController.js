@@ -8,10 +8,11 @@ exports.findAllNotification = async (req, res) => {
   try {
    
     const notifications = await notificationModel.find();
+    console.log("notifications: ",notifications)
     if (!notifications || notifications.length==0) 
     {res.status(401).json("notifications doesn't exist");}
     else
-    {res.status(200).send({ message: "success", data: notificationExist });}
+    {res.status(200).send({ message: "success", data: notifications });}
   } catch (error) {
     res.status(500).json({
       message: "Internal server error .",
@@ -90,7 +91,7 @@ exports.createNotification = async (req, res) => {
 exports.sendNotification = async (req, res) => {
   // retrieve all the attributes passed it in body 
    let obj= {title,icon,link,body,from,consignees,categoryType,notifType}=req.body;
-   console.log("registrationTokens :  ",req.body.registrationTokens)
+   
    try {
    const  registrationTokens = req.body.registrationTokens
    //put your server key here
