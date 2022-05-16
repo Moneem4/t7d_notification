@@ -38,7 +38,7 @@ exports.findOneNotification = async (req, res) => {
 exports.findNotificationsByProfileId = async (req, res) => {
   try {
     const { profileId } = req.params;
-    const notifications = await notificationModel.find({ to: profileId });
+    const notifications = await notificationModel.find({ "to.profile_id": profileId });
     if (!notifications || notifications.length==0) {res.status(401).json("notification doesn't exist");}
     else {
       res.status(200).send({ message: "success", data: notifications });
@@ -123,7 +123,7 @@ exports.sendNotification = async (req, res) => {
    {
   const notificationSaved= await notificationCreated.save();   
   res.status(res.statusCode).send({ message: "success",data:notificationSaved});
-}  
+  }  
     
  }
 })    
