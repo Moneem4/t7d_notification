@@ -8,7 +8,6 @@ exports.findAllNotification = async (req, res) => {
   try {
    
     const notifications = await notificationModel.find();
-    console.log("notifications: ",notifications)
     if (!notifications || notifications.length==0) 
     {res.status(401).json("notifications doesn't exist");}
     else
