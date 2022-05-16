@@ -9,9 +9,9 @@ exports.findAllNotification = async (req, res) => {
    
     const notifications = await notificationModel.find();
     if (!notifications || notifications.length==0) 
-    {res.status(401).json("notifications doesn't exist");}
+    {res.status(res.statusCode).json("notifications doesn't exist");}
     else
-    {res.status(200).send({ message: "success", data: notifications });}
+    {res.status(res.statusCode).send({ message: "success", data: notifications });}
   } catch (error) {
     res.status(500).json({
       message: "Internal server error .",
@@ -25,8 +25,8 @@ exports.findOneNotification = async (req, res) => {
     try {
       const { id } = req.params;
       const notificationExist = await notificationModel.findOne({ _id: id });
-      if (!notificationExist) res.status(401).json("notification doesn't exist");
-      res.status(200).send({ message: "success", data: notificationExist });
+      if (!notificationExist) res.status(res.statusCode).json("notification doesn't exist");
+      res.status(res.statusCode).send({ message: "success", data: notificationExist });
     } catch (error) {
       res.status(500).json({
         message: "Internal server error .",
@@ -39,9 +39,9 @@ exports.findNotificationsByProfileId = async (req, res) => {
   try {
     const { profileId } = req.params;
     const notifications = await notificationModel.find({ "to.profile_id": profileId });
-    if (!notifications || notifications.length==0) {res.status(401).json("notification doesn't exist");}
+    if (!notifications || notifications.length==0) {res.status(res.statusCode).json("notification doesn't exist");}
     else {
-      res.status(200).send({ message: "success", data: notifications });
+      res.status(res.statusCode).send({ message: "success", data: notifications });
     }
   } catch (error) {
     res.status(500).json({
@@ -55,9 +55,9 @@ exports.findAllSeenNotification = async (req, res) => {
   try {
     const { profileId } = req.params;
     const notifications = await notificationModel.find({ "to.profile_id": profileId,"to.seen":true });
-    if (!notifications || notifications.length==0) {res.status(401).json("notification doesn't exist");}
+    if (!notifications || notifications.length==0) {res.status(res.statusCode).json("notification doesn't exist");}
     else {
-      res.status(200).send({ message: "success", data: notifications });
+      res.status(res.statusCode).send({ message: "success", data: notifications });
     }
   } catch (error) {
     res.status(500).json({
@@ -76,7 +76,7 @@ exports.createNotification = async (req, res) => {
       notification.to.push({ profileId: profile });
     })
     const notificationCreated=   await notification.save();
-    res.status(200).send({ message: "success", data: notificationCreated });
+    res.status(res.statusCode).send({ message: "success", data: notificationCreated });
   } catch (error) {
     res.status(500).json({
       message: "error",
@@ -122,7 +122,7 @@ exports.sendNotification = async (req, res) => {
     if(notificationCreated.to && notificationCreated.to.length > 0)
    {
   const notificationSaved= await notificationCreated.save();   
-  res.status(res.statusCode).send({ message: "success",data:notificationSaved});
+  res.status(res.statusCode).send({ message: "success",data:{response,notificationSaved}});
   }  
     
  }
@@ -146,11 +146,11 @@ exports.updateNotification = async (req, res) => {
     const notification= req.body
     const n = await notificationModel.findById(id);
     if (!n)
-      res.status(404).json({ message: "Failure", data: { errorMessage: "This notification does not exist!" } });
+      res.status(res.statusCode).json({ message: "Failure", data: { errorMessage: "This notification does not exist!" } });
     else {
    
     const updatedNotification = await notificationModel.findByIdAndUpdate(id, notification, { new: true });
-    return res.status(200).json({ message: "Success", data: updatedNotification });
+    return res.status(res.statusCode).json({ message: "Success", data: updatedNotification });
   }
  } catch (error) {
     res.status(500).json({
@@ -166,9 +166,9 @@ exports.deleteNotification = async (req, res) => {
   try {
     const { id } = req.params;
     const notificationExist = await notificationModel.findOne({ _id: id });
-    if (!notificationExist) res.status(401).json("notification doesn't exist");
+    if (!notificationExist) res.status(res.statusCode).json("notification doesn't exist");
     const response = await notificationExist.deleteOne({ _id: id });
-    res.status(200).send({ message: "success", data: response });
+    res.status(res.statusCode).send({ message: "success", data: response });
   } catch (error) {
     res.status(500).json({
       message: "Internal server error .",
