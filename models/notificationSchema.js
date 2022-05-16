@@ -9,27 +9,35 @@ const notificationSchema = new Schema(
     },
     body: {
       type: String,
-      required: false,
+      
     },
     from: {
       type: String,
-      required: false,
+      
 
     },
-    to: {
+    to: [{
+    profile_id:{
       type: String,
-      required: false,
+      
     
     },
-    link: {
-      type: String,
-      required: false,
+    seen: {
+    type:Boolean,
+    default: false
+
+    },
+    muted: {
+      type: Boolean,
+      default: false
     
+    },
+  }],
+    link: {
+      type: String, 
     },
     icon: {
       type: String,
-      required: false,
-  
     },
   
     seen: {
@@ -37,11 +45,7 @@ const notificationSchema = new Schema(
       default: false
     
     },
-    muted: {
-      type: Boolean,
-      default: false
     
-    },
     categoryType: {
       type: String,
        enum: ["TOURNAMENT","TEAMS","PROFILE","SUBSCRIPTION","SYSTEM_NOTIF"]
