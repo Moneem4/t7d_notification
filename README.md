@@ -1,7 +1,7 @@
 # T7D
 # this is the code source of notification microservice 
-# we have four main types of notification : 
--TOURNAMENT,
+# we have five main types of notification : 
+-TOURNAMENT
 -TEAMS
 -PROFILE
 -SUBSCRIPTION
