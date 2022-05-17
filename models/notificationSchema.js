@@ -48,13 +48,12 @@ const notificationSchema = new Schema(
     
     categoryType: {
       type: String,
-       enum: ["TOURNAMENT","TEAMS","PROFILE","SUBSCRIPTION","SYSTEM_NOTIF"]
+       enum: ['TOURNAMENT','TEAMS','PROFILE','SUBSCRIPTION','SYSTEM_NOTIF']
     },
     notifType: {
-       type: String, enum: ["INTERACTIVE", "INFO"]  
-      },
-  },
-     
-     { timestamps: true }
+       type: String, enum: ['INTERACTIVE','INFO']  
+    },
+  },     
+  { timestamps: true }
 );
 module.exports = mongoose.model('Notification', notificationSchema)
