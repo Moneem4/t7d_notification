@@ -39,13 +39,6 @@ const notificationSchema = new Schema(
     icon: {
       type: String,
     },
-  
-    seen: {
-      type: Boolean,
-      default: false
-    
-    },
-    
     categoryType: {
       type: String,
        enum: ['TOURNAMENT','TEAMS','PROFILE','SUBSCRIPTION','SYSTEM_NOTIF']

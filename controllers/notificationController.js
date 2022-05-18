@@ -1,6 +1,7 @@
 
 const notificationModel = require('../models/notificationSchema');
 const FCM = require('fcm-node');
+const Mongoose = require("mongoose");
  //Notification controller
 /*********************************************************************************************/ 
 // find all notifications
@@ -170,6 +171,57 @@ exports.deleteNotification = async (req, res) => {
     const response = await notificationExist.deleteOne({ _id: id });
     res.status(res.statusCode).send({ message: "success", data: response });
   } catch (error) {
+    res.status(500).json({
+      message: "Internal server error .",
+      error,
+    });
+  }
+};
+// mute notification by user
+exports.muteNotification = async (req, res) => {
+  const { profile_id } = req.params;
+  let { from_id } = req.body;
+try {
+  const notifications = await notificationModel.updateMany({ 
+    $and: [
+    { "to.profile_id": profile_id },
+    { from:from_id}
+]},
+{$set:{ "to.$.mute": true  },
+});
+console.log(notifications)
+if (!notifications || notifications.matchedCount===0) res.status(res.statusCode).json("no notification founded for this profile");
+
+ if(notifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile was seeing this notification " });} 
+
+} catch (error) {
+  console.log(error),
+  res.status(500).json({
+    message: "Internal server error .",
+    error,
+  });
+}
+};
+// see notification by user
+exports.seeNotification = async (req, res) => {
+    const { profile_id } = req.params;
+    let { from_id } = req.body;
+  try {
+    const notifications = await notificationModel.updateMany({ 
+      $and: [
+      { "to.profile_id": profile_id },
+      { from:from_id},
+        {"to.seen" :false}
+  ]},
+  {$set:{ "to.$.seen": true  },
+});
+console.log(notifications)
+  if (!notifications || notifications.matchedCount===0) res.status(res.statusCode).json("no notification founded for this profile");
+
+   if(notifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile was seeing this notification " });} 
+
+  } catch (error) {
+    console.log(error),
     res.status(500).json({
       message: "Internal server error .",
       error,
