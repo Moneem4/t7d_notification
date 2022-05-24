@@ -8,7 +8,7 @@ exports.findAllNotification = async (req, res) => {
   try {
    
     const notifications = await notificationModel.find();
-    if (!notifications || notifications.length==0) 
+    if (!notifications || notifications.length===0) 
     {res.status(res.statusCode).json("notifications doesn't exist");}
     else
     {res.status(res.statusCode).send({ message: "success", data: notifications });}
@@ -39,7 +39,7 @@ exports.findNotificationsByProfileId = async (req, res) => {
   try {
     const { profileId } = req.params;
     const notifications = await notificationModel.find({ "to.profile_id": profileId });
-    if (!notifications || notifications.length==0) {res.status(res.statusCode).json("notification doesn't exist");}
+    if (!notifications || notifications.length===0) {res.status(res.statusCode).json("notification doesn't exist");}
     else {
       res.status(res.statusCode).send({ message: "get notifications successfully", data: notifications });
     }
@@ -55,7 +55,7 @@ exports.findAllSeenNotification = async (req, res) => {
   try {
     const { profileId } = req.params;
     const notifications = await notificationModel.find({ "to.profile_id": profileId,"to.seen":true });
-    if (!notifications || notifications.length==0) {res.status(res.statusCode).json("notification doesn't exist");}
+    if (!notifications || notifications.length===0) {res.status(res.statusCode).json("notification doesn't exist");}
     else {
       res.status(res.statusCode).send({ message: "find All Seen Notification successfully", data: notifications });
     }
