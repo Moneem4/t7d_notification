@@ -218,7 +218,7 @@ exports.seeNotification = async (req, res) => {
 
   if (!seenNotifications || seenNotifications.matchedCount===0) res.status(res.statusCode).json("no notification founded for this profile");
 
-   if(seenNotifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile was seeing this notification " });} 
+   if(seenNotifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile's account already seeing this notification " });} 
 
   } catch (error) {
     console.log(error),
