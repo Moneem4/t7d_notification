@@ -1,7 +1,6 @@
 
 const notificationModel = require('../models/notificationSchema');
 const FCM = require('fcm-node');
-const Mongoose = require("mongoose");
  //Notification controller
 /*********************************************************************************************/ 
 // find all notifications
