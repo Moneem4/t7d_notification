@@ -184,14 +184,16 @@ try {
   const mutedNotifications = await notificationModel.updateMany({ 
     $and: [
     { "to.profile_id": profile_id },
-    { from:from_id}
+    { from:from_id},
+    {"to.muted": false}
 ]},
-{$set:{ "to.$.mute": true  },
+{$set:{ "to.$.muted": true  },
 });
-console.log(mutedNotifications)
-if (!mutedNotifications|| mutedNotifications===0) res.status(res.statusCode).json("no notification founded for this profile");
+console.log("muted notifications",mutedNotifications)
+if (!mutedNotifications|| mutedNotifications.matchedCount===0) res.status(res.statusCode).json("no notification founded for this profile");
 
- if(mutedNotifications>0) { res.status(res.statusCode).send({ message: "this profile was seeing this notification " });} 
+ if(mutedNotifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile has muted this notification " });} 
+ 
 
 } catch (error) {
   console.log(error),
@@ -214,10 +216,10 @@ exports.seeNotification = async (req, res) => {
   ]},
   {$set:{ "to.$.seen": true  },
 });
-
+   console.log(seenNotifications)
   if (!seenNotifications || seenNotifications.matchedCount===0) res.status(res.statusCode).json("no notification founded for this profile");
 
-   if(seenNotifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile's account already seeing this notification " });} 
+   if(seenNotifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile's account  see this notification with success " });} 
 
   } catch (error) {
     console.log(error),
