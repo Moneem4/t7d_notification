@@ -181,7 +181,13 @@ exports.muteNotification = async (req, res) => {
   const { profile_id } = req.params;
   let { from_id } = req.body;
 try {
-  const mutedNotifications = await notificationModel.updateMany({ 
+  const notificationsFound= await notificationModel.find({ "to.profile_id": profile_id,"from":from_id });
+  if (!notificationsFound || notificationsFound.length ===0) 
+  {
+  res.status(res.statusCode).json("no notification founded for this profile");
+  }
+
+ else { const mutedNotifications = await notificationModel.updateMany({ 
     $and: [
     { "to.profile_id": profile_id },
     { from:from_id},
@@ -189,11 +195,12 @@ try {
 ]},
 {$set:{ "to.$.muted": true  },
 });
-console.log("muted notifications",mutedNotifications)
-if (!mutedNotifications|| mutedNotifications.matchedCount===0) res.status(res.statusCode).json("no notification founded for this profile");
+
+
 
  if(mutedNotifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile has muted this notification " });} 
- 
+ else  res.status(res.statusCode).send({ message: "this profile has already mute this notification " });
+ }
 
 } catch (error) {
   console.log(error),
@@ -208,7 +215,15 @@ exports.seeNotification = async (req, res) => {
     const { profile_id } = req.params;
     let { from_id } = req.body;
   try {
-    const seenNotifications = await notificationModel.updateMany({ 
+    const notificationsFound= await notificationModel.find({ "to.profile_id": profile_id,"from":from_id });
+    
+    if (!notificationsFound || notificationsFound.length ===0 ) 
+    {
+    res.status(res.statusCode).json("no notification founded for this profile");
+    }
+    else
+    { 
+     const seenNotifications = await notificationModel.updateMany({ 
       $and: [
       { "to.profile_id": profile_id },
       { from:from_id},
@@ -216,11 +231,13 @@ exports.seeNotification = async (req, res) => {
   ]},
   {$set:{ "to.$.seen": true  },
 });
-   console.log(seenNotifications)
-  if (!seenNotifications || seenNotifications.matchedCount===0) res.status(res.statusCode).json("no notification founded for this profile");
-
-   if(seenNotifications.modifiedCount>0) { res.status(res.statusCode).send({ message: "this profile's account  see this notification with success " });} 
-
+   if(seenNotifications.modifiedCount>0) 
+   {
+    res.status(res.statusCode).send({ message: "this profile's account  see this notification with success " });
+   } 
+    else  
+    res.status(res.statusCode).send({ message: "this profile has already see this notification " });
+  }
   } catch (error) {
     console.log(error),
     res.status(500).json({
