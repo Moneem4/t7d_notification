@@ -90,9 +90,33 @@ exports.createNotification = async (req, res) => {
 exports.sendNotification = async (req, res) => {
   // retrieve all the attributes passed it in body 
    let obj= {title,icon,link,body,from,consignees,categoryType,notifType}=req.body;
+   let bool =false
+   for (consignee of consignees)
+   {    
+       let notificationsFound= await notificationModel.find(
+     { 
+        $and: 
+        [
+          {"to.profile_id": consignee},
+       {"from":from},
+       {"to.muted": true} 
+       ]
+    });
+  
+     console.log("notifications found ",notificationsFound)
+     console.log("length : ",notificationsFound.length)
+    if (notificationsFound && notificationsFound.length >0) 
+    {
+    bool=true
+    }
+  } 
+  if(bool===true)
+  {res.status(500).json("this type notification was muted by the receiver ");
+   return
+  }
+   try { 
    
-   try {
-   const  registrationTokens = req.body.registrationTokens
+const  registrationTokens = req.body.registrationTokens
    //put your server key here
    const serverKey =process.env.SERVER_KEY; 
    let fcm= new FCM(serverKey) 
