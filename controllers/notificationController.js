@@ -1,6 +1,8 @@
 
 const notificationModel = require('../models/notificationSchema');
 const FCM = require('fcm-node');
+const {display_error_message} = require('../global_functions/display_error_message')
+const mongoose = require('mongoose');
  //Notification controller
 /*********************************************************************************************/ 
 // find all notifications
@@ -42,8 +44,7 @@ exports.findNotificationsByProfileId = async (req, res) => {
   }
  };
 // findAllSeenNotification
-exports.findAllSeenNotification = async (req, res) => {
-  console.log("profileId: " );
+exports.findAllSeenNotificationByProfileId = async (req, res) => {
   try {
     const {profileId}  = req.verified;
    
@@ -177,10 +178,10 @@ exports.muteNotification = async (req, res) => {
   const { profileId } = req.verified;
   let { from_id } = req.body;
 try {
-  const notificationsFound= await notificationModel.find({ "to.profile_id": profileId,"from":from_id });
+  const notificationsFound= await notificationModel.find({ "to.profile_id": profileId,"from":from_id, "to.muted": false });
   if (!notificationsFound || notificationsFound.length ===0) 
   {
-  res.status(res.statusCode).json("no notification founded for this profile");
+  res.status(res.statusCode).json("no notification founded for this profile or the profile was muted this notification already");
   }
 
  else { const mutedNotifications = await notificationModel.updateMany({ 
@@ -204,10 +205,11 @@ try {
 };
 // see notification by user
 exports.seeNotification = async (req, res) => {
-    const { profileId } = req.verified;
-    let { from_id } = req.body;
+   const {notificationId}=req.params
+   const {profileId}=req.verified
+   console.log("fff ",notificationId);
   try {
-    const notificationsFound= await notificationModel.find({ "to.profile_id": profileId,"from":from_id });
+    const notificationsFound= await notificationModel.findOne({ _id:notificationId });
     
     if (!notificationsFound || notificationsFound.length ===0 ) 
     {
@@ -215,14 +217,15 @@ exports.seeNotification = async (req, res) => {
     }
     else
     { 
-     const seenNotifications = await notificationModel.updateMany({ 
+     const seenNotifications = await notificationModel.updateOne({ 
       $and: [
-      { "to.profile_id": profileId },
-      { from:from_id},
+      { "_id": notificationId },
+      { "to.profile_id":profileId},
         {"to.seen" :false}
   ]},
   {$set:{ "to.$.seen": true  },
 });
+console.log("gggg ",seenNotifications)
    if(seenNotifications.modifiedCount>0) 
    {
     res.status(res.statusCode).send({ message: "this profile's account  see this notification with success " });
