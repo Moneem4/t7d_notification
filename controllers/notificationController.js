@@ -13,10 +13,7 @@ exports.findAllNotification = async (req, res) => {
     else
     {res.status(res.statusCode).send({ message: "success", data: notifications });}
   } catch (error) {
-    res.status(500).json({
-      message: "Internal server error .",
-      error,
-    });
+    display_error_message(res, error,500);
  };
 
 }
@@ -28,42 +25,35 @@ exports.findOneNotification = async (req, res) => {
       if (!notificationExist) res.status(res.statusCode).json("notification doesn't exist");
       res.status(res.statusCode).send({ message: "success", data: notificationExist });
     } catch (error) {
-      res.status(500).json({
-        message: "Internal server error .",
-        error,
-      });
+      display_error_message(res, error,500);
     }
   };
   // find  notifications by UserId
 exports.findNotificationsByProfileId = async (req, res) => {
   try {
-    const { profileId } = req.params;
+    const {profileId}  = req.verified;
     const notifications = await notificationModel.find({ "to.profile_id": profileId });
     if (!notifications || notifications.length===0) {res.status(res.statusCode).json("notification doesn't exist");}
     else {
-      res.status(res.statusCode).send({ message: "get notifications successfully", data: notifications });
+      res.status(res.statusCode).send({ message: " Success", data: notifications });
     }
   } catch (error) {
-    res.status(500).json({
-      message: "Internal server error .",
-      error,
-    });
+    display_error_message(res, error,500);
   }
  };
 // findAllSeenNotification
 exports.findAllSeenNotification = async (req, res) => {
+  console.log("profileId: " );
   try {
-    const { profileId } = req.params;
+    const {profileId}  = req.verified;
+   
     const notifications = await notificationModel.find({ "to.profile_id": profileId,"to.seen":true });
     if (!notifications || notifications.length===0) {res.status(res.statusCode).json("notification doesn't exist");}
     else {
-      res.status(res.statusCode).send({ message: "find All Seen Notification successfully", data: notifications });
+      res.status(res.statusCode).send({ message: "Success", data: notifications });
     }
   } catch (error) {
-    res.status(500).json({
-      message: "Internal server error .",
-      error,
-    });
+    display_error_message(res, error,500);
   }
  };
 //create notification 
@@ -78,12 +68,7 @@ exports.createNotification = async (req, res) => {
     const notificationCreated=   await notification.save();
     res.status(res.statusCode).send({ message: "success", data: notificationCreated });
   } catch (error) {
-    res.status(500).json({
-      message: "error",
-      data: {
-        errorMessage: "Some error occurred while creating notification",
-      },
-    });
+    display_error_message(res, error,500);
   }
 };
 // Send  notification using node-cron 
@@ -103,8 +88,7 @@ exports.sendNotification = async (req, res) => {
        ]
     });
   
-     console.log("notifications found ",notificationsFound)
-     console.log("length : ",notificationsFound.length)
+     
     if (notificationsFound && notificationsFound.length >0) 
     {
     bool=true
@@ -152,12 +136,7 @@ const  registrationTokens = req.body.registrationTokens
  }
 })    
 } catch(error) {
-  res.status(500).json({
-    message: "error",
-    data: {
-      errorMessage: "Some error occurred ",
-    },
-  });
+  display_error_message(res, error,500);
   
 }
 
@@ -177,11 +156,7 @@ exports.updateNotification = async (req, res) => {
     return res.status(res.statusCode).json({ message: "Success", data: updatedNotification });
   }
  } catch (error) {
-    res.status(500).json({
-      message: " Internal server error occurred .",
-      error,
-    });
-    console.log(error);
+  display_error_message(res, error,500);
   }
 };
 
@@ -194,18 +169,15 @@ exports.deleteNotification = async (req, res) => {
     const response = await notificationExist.deleteOne({ _id: id });
     res.status(res.statusCode).send({ message: "success", data: response });
   } catch (error) {
-    res.status(500).json({
-      message: "Internal server error .",
-      error,
-    });
+    display_error_message(res, error,500);
   }
 };
 // mute notification by user
 exports.muteNotification = async (req, res) => {
-  const { profile_id } = req.params;
+  const { profileId } = req.verified;
   let { from_id } = req.body;
 try {
-  const notificationsFound= await notificationModel.find({ "to.profile_id": profile_id,"from":from_id });
+  const notificationsFound= await notificationModel.find({ "to.profile_id": profileId,"from":from_id });
   if (!notificationsFound || notificationsFound.length ===0) 
   {
   res.status(res.statusCode).json("no notification founded for this profile");
@@ -213,7 +185,7 @@ try {
 
  else { const mutedNotifications = await notificationModel.updateMany({ 
     $and: [
-    { "to.profile_id": profile_id },
+    { "to.profile_id": profileId },
     { from:from_id},
     {"to.muted": false}
 ]},
@@ -227,19 +199,15 @@ try {
  }
 
 } catch (error) {
-  console.log(error),
-  res.status(500).json({
-    message: "Internal server error .",
-    error,
-  });
+  display_error_message(res, error,500);
 }
 };
 // see notification by user
 exports.seeNotification = async (req, res) => {
-    const { profile_id } = req.params;
+    const { profileId } = req.verified;
     let { from_id } = req.body;
   try {
-    const notificationsFound= await notificationModel.find({ "to.profile_id": profile_id,"from":from_id });
+    const notificationsFound= await notificationModel.find({ "to.profile_id": profileId,"from":from_id });
     
     if (!notificationsFound || notificationsFound.length ===0 ) 
     {
@@ -249,7 +217,7 @@ exports.seeNotification = async (req, res) => {
     { 
      const seenNotifications = await notificationModel.updateMany({ 
       $and: [
-      { "to.profile_id": profile_id },
+      { "to.profile_id": profileId },
       { from:from_id},
         {"to.seen" :false}
   ]},
@@ -263,10 +231,6 @@ exports.seeNotification = async (req, res) => {
     res.status(res.statusCode).send({ message: "this profile has already see this notification " });
   }
   } catch (error) {
-    console.log(error),
-    res.status(500).json({
-      message: "Internal server error .",
-      error,
-    });
+    display_error_message(res, error,500);
   }
 };
