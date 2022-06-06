@@ -10,48 +10,44 @@ const notificationSchema = new Schema(
     },
     body: {
       type: String,
-      required: false,
+      
     },
     from: {
       type: String,
-      required: false,
+      
 
     },
-    to: {
+    to: [{
+    profile_id:{
       type: String,
-      required: false,
+      
     
     },
-    link: {
-      type: String,
-      required: false,
-    
-    },
-    icon: {
-      type: String,
-      required: false,
-  
-    },
-  
     seen: {
-      type: Boolean,
-      default: false
-    
+    type:Boolean,
+    default: false
+
     },
     muted: {
       type: Boolean,
       default: false
     
     },
+  }],
+    link: {
+      type: String, 
+    },
+    icon: {
+      type: String,
+    },
     categoryType: {
       type: String,
-       enum: ["TOURNAMENT","TEAMS","PROFILE","SUBSCRIPTION","SYSTEM_NOTIF"]
+       enum: ['TOURNAMENT','TEAMS','PROFILE','SUBSCRIPTION','SYSTEM_NOTIF']
     },
     notifType: {
-       type: String, enum: ["INTERACTIVE", "INFO"]  
-      },
-  },
-     
-     { timestamps: true }
+       type: String, enum: ['INTERACTIVE','INFO']  
+    },
+  },     
+  { timestamps: true }
 );
 module.exports = mongoose.model('Notification', notificationSchema)
