@@ -42,7 +42,7 @@ const notificationSchema = new Schema(
     },
     categoryType: {
       type: String,
-       enum: ['TOURNAMENT','TEAMS','PROFILE','SUBSCRIPTION','SYSTEM_NOTIF']
+       enum: ['TOURNAMENT','TEAMS','PROFILE','SUBSCRIPTION','SYSTEM_NOTIF','QUEST']
     },
     notifType: {
        type: String, enum: ['INTERACTIVE','INFO']  
