@@ -14,14 +14,13 @@ const notificationSchema = new Schema(
     },
     from: {
       type: String,
-      
-
+    },
+    tournamentId: {
+      type: String,
     },
     to: [{
     profile_id:{
-      type: String,
-      
-    
+      type: String, 
     },
     seen: {
     type:Boolean,
