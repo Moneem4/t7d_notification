@@ -75,7 +75,7 @@ exports.createNotification = async (req, res) => {
 // Send  notification using node-cron 
 exports.sendNotification = async (req, res) => {
   // retrieve all the attributes passed it in body 
-   let obj= {title,icon,link,body,from,consignees,categoryType,notifType}=req.body;
+   let obj= {title,icon,link,body,from,consignees,categoryType,notifType,tournamentId}=req.body;
    let bool =false
    for (consignee of consignees)
    {    
@@ -106,6 +106,10 @@ const  registrationTokens = req.body.registrationTokens
    const serverKey =process.env.SERVER_KEY; 
    let fcm= new FCM(serverKey) 
    const notificationCreated = new notificationModel(obj);
+   if(tournamentId)
+   {
+   notificationCreated.tournamentId=tournamentId 
+   }
      var message = { 
      //this may vary according to the message type (single recipient, multicast, topic, et cetera)
      registration_ids: registrationTokens, 
